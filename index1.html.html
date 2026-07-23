@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atendimento Nota 10 — Experiência do Cliente Brewteco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --malt-black:#1B140F;
+    --barrel-brown:#2B2019;
+    --card:#332619;
+    --copper:#1F6F64;
+    --amber:#3FBF9E;
+    --foam:#F3E9D6;
+    --text:#E8DFCF;
+    --text-dim:#B7A98F;
+    --line: rgba(63,191,158,0.25);
+    --good:#7FA65A;
+    --bad:#C1544A;
+    --ggc-bordo:#4A0E14;
+    --ggc-gold:#D4AF37;
+    --jade-seal:#1F6F64;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at top left, rgba(31,111,100,0.12), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(63,191,158,0.08), transparent 55%),
+      var(--malt-black);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.6;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-size:.72rem;
+    color:var(--amber);
+  }
+  h1,h2,h3{font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em; margin:0; color:var(--foam);}
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px;}
+
+  .hero{padding:64px 0 40px; border-bottom:1px solid var(--line);}
+  .hero-grid{display:flex; gap:40px; align-items:center; flex-wrap:wrap;}
+  .hero-text{flex:1 1 380px;}
+  .hero h1{font-size:2.5rem; line-height:1.05; margin-bottom:14px;}
+  .hero h1 span{color:var(--amber);}
+  .hero p{color:var(--text-dim); max-width:46ch;}
+  .glass-wrap{flex:0 0 180px; display:flex; flex-direction:column; align-items:center; gap:10px;}
+  #glassFill{transition: y 0.8s ease, height 0.8s ease;}
+  .glass-label{font-family:'JetBrains Mono',monospace; font-size:.75rem; color:var(--text-dim); text-align:center;}
+  .glass-label b{color:var(--amber); font-size:1rem;}
+
+  .progress-track{
+    position:sticky; top:0; z-index:50;
+    background:rgba(27,20,15,0.92); backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+    padding:10px 0;
+  }
+  .dots{display:flex; gap:8px; justify-content:center; flex-wrap:wrap;}
+  .dot{
+    font-family:'JetBrains Mono',monospace; font-size:.68rem;
+    padding:6px 12px; border-radius:20px; border:1px solid var(--line);
+    color:var(--text-dim); cursor:pointer; white-space:nowrap; transition:.2s;
+  }
+  .dot.active{background:var(--copper); color:var(--foam); border-color:var(--copper);}
+  .dot.done{color:var(--amber); border-color:var(--amber);}
+
+  section.module{padding:56px 0; border-bottom:1px solid var(--line);}
+  .mod-head{display:flex; align-items:baseline; gap:16px; margin-bottom:18px;}
+  .mod-num{font-family:'JetBrains Mono',monospace; color:var(--copper); font-size:1rem; font-weight:700;}
+  .mod-head h2{font-size:1.6rem;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:22px 24px; margin:18px 0;
+  }
+  .tip{
+    border-left:3px solid var(--amber);
+    background: rgba(63,191,158,0.07);
+    padding:14px 18px; border-radius:0 8px 8px 0; margin-top:16px;
+  }
+  .tip .eyebrow{margin-bottom:4px; display:block;}
+  ul.simple{padding-left:1.2em; margin:10px 0;}
+  ul.simple li{margin-bottom:6px;}
+  .mark-btn{
+    margin-top:20px; background:transparent; border:1px solid var(--amber); color:var(--amber);
+    font-family:'JetBrains Mono',monospace; font-size:.8rem; letter-spacing:.05em;
+    padding:10px 18px; border-radius:6px; cursor:pointer; text-transform:uppercase;
+    transition:.2s;
+  }
+  .mark-btn:hover{background:var(--amber); color:var(--malt-black);}
+  .mark-btn.done{background:var(--amber); color:var(--malt-black); cursor:default;}
+
+  .q-block{margin-bottom:26px; padding-bottom:22px; border-bottom:1px dashed var(--line);}
+  .q-block:last-child{border-bottom:none;}
+  .q-title{font-weight:600; color:var(--foam); margin-bottom:12px;}
+  .opt{
+    display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:8px;
+    border:1px solid var(--line); border-radius:8px; cursor:pointer; transition:.15s;
+  }
+  .opt:hover{border-color:var(--amber);}
+  .opt.selected{border-color:var(--amber); background:rgba(63,191,158,0.08);}
+  .opt.correct{border-color:var(--good); background:rgba(127,166,90,0.12);}
+  .opt.incorrect{border-color:var(--bad); background:rgba(193,84,74,0.12);}
+  .opt input{accent-color:var(--amber);}
+  #submitQuiz, #resetQuiz{
+    background:var(--copper); color:var(--foam); border:none; font-family:'JetBrains Mono',monospace;
+    text-transform:uppercase; letter-spacing:.05em; padding:14px 26px; border-radius:6px;
+    font-size:.85rem; cursor:pointer; margin-top:10px;
+  }
+  #resetQuiz{background:transparent; border:1px solid var(--text-dim); color:var(--text-dim); margin-left:10px;}
+  #quizResult{margin-top:20px; padding:18px; border-radius:8px; font-family:'JetBrains Mono',monospace;}
+  #quizResult.pass{background:rgba(127,166,90,0.15); border:1px solid var(--good); color:var(--good);}
+  #quizResult.fail{background:rgba(193,84,74,0.15); border:1px solid var(--bad); color:var(--bad);}
+
+  #certSection{display:none;}
+  .cert-form{display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:28px;}
+  .cert-form input, .cert-form select{
+    flex:1 1 260px; background:var(--barrel-brown); border:1px solid var(--line); color:var(--foam);
+    padding:12px 14px; border-radius:6px; font-family:'Inter',sans-serif; font-size:1rem;
+  }
+  .cert-form button{
+    background:var(--jade-seal); color:#FBF3E7; border:none; font-family:'JetBrains Mono',monospace;
+    text-transform:uppercase; font-weight:700; letter-spacing:.05em; padding:13px 22px;
+    border-radius:6px; cursor:pointer;
+  }
+  #certificate{
+    display:none;
+    background:
+      radial-gradient(ellipse at top left, rgba(212,175,55,0.08), transparent 60%),
+      #FBF3E7;
+    border:3px solid var(--ggc-bordo);
+    border-radius:4px;
+    padding:56px 48px;
+    position:relative;
+    overflow:hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  }
+  #certificate::before{
+    content:"";
+    position:absolute; inset:10px;
+    border:1.5px solid var(--jade-seal);
+    pointer-events:none;
+  }
+  .cert-eyebrow{font-family:'JetBrains Mono',monospace; letter-spacing:.25em; text-transform:uppercase; color:var(--ggc-bordo); font-size:.75rem; text-align:center;}
+  .cert-title{font-family:'Oswald',sans-serif; text-transform:uppercase; text-align:center; color:var(--ggc-bordo); font-size:2.1rem; margin:10px 0 4px;}
+  .cert-sub{text-align:center; color:#8A6A55; font-size:.85rem; margin-bottom:30px;}
+  .cert-name{
+    font-family:'Oswald',sans-serif; text-align:center; font-size:2.4rem; color:var(--ggc-bordo);
+    border-bottom:1px solid rgba(74,14,20,0.25); padding-bottom:18px; margin-bottom:18px; text-transform:none;
+  }
+  .cert-body{text-align:center; color:#3A2A22; max-width:56ch; margin:0 auto 26px;}
+  .cert-foot{display:flex; justify-content:space-between; align-items:flex-end; margin-top:36px; font-family:'JetBrains Mono',monospace; font-size:.72rem; color:#8A6A55;}
+  .cert-seal{
+    width:64px; height:64px; border-radius:50%; border:2px solid var(--jade-seal); color:var(--jade-seal);
+    background: rgba(31,111,100,0.12);
+    display:flex; align-items:center; justify-content:center; font-family:'Oswald',sans-serif; font-size:.65rem;
+    text-transform:uppercase; text-align:center; line-height:1.1;
+  }
+  #downloadBtn{
+    margin-top:24px; background:transparent; border:1px solid var(--jade-seal); color:var(--jade-seal);
+    font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.05em;
+    padding:12px 22px; border-radius:6px; cursor:pointer;
+  }
+  footer{padding:40px 0 70px; text-align:center; color:var(--text-dim); font-family:'JetBrains Mono',monospace; font-size:.75rem;}
+  @media(max-width:600px){
+    .hero h1{font-size:1.9rem;}
+    #certificate{padding:34px 20px;}
+    .cert-name{font-size:1.7rem;}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-track">
+  <div class="wrap">
+    <div class="dots" id="dots"></div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-text">
+      <span class="eyebrow">Universidade Brewteco · GGC</span>
+      <h1>Atendimento Nota 10: <span>a experiência é o nosso produto</span></h1>
+      <p>Um curso rápido e prático sobre atendimento e experiência do cliente — do jeito Brewteco de ser. No final, tem avaliação e certificado.</p>
+    </div>
+    <div class="glass-wrap">
+      <svg width="120" height="150" viewBox="0 0 120 150">
+        <defs>
+          <clipPath id="glassClip">
+            <path d="M28 10 L92 10 L84 138 Q60 148 36 138 Z"/>
+          </clipPath>
+        </defs>
+        <path d="M28 10 L92 10 L84 138 Q60 148 36 138 Z" fill="none" stroke="var(--amber)" stroke-width="3"/>
+        <g clip-path="url(#glassClip)">
+          <rect id="glassFill" x="20" y="150" width="100" height="0" fill="var(--copper)"/>
+          <rect id="glassFoam" x="20" y="146" width="100" height="6" fill="var(--foam)" opacity="0.85"/>
+        </g>
+      </svg>
+      <div class="glass-label">SEU COPO DE<br>CONHECIMENTO<br><b id="glassPct">0%</b> cheio</div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section class="module" id="idGate">
+  <div class="mod-head"><h2>Antes de começar</h2></div>
+  <div class="card">
+    <p>Para gerar seu certificado ao final e para o registro de conclusão do curso, precisamos identificar você.</p>
+    <p style="font-size:.82rem; color:var(--text-dim);">Seu CPF é usado apenas para identificação interna do registro de treinamento — não aparece publicamente em nenhum lugar do curso.</p>
+    <div class="cert-form">
+      <input type="text" id="gateName" placeholder="Nome completo">
+      <input type="text" id="gateCPF" placeholder="CPF (só números)" maxlength="14" inputmode="numeric">
+      <select id="gateUnit">
+        <option value="">Selecione sua unidade</option>
+        <option>Gávea</option>
+        <option>Terraço</option>
+        <option>Tijuca</option>
+        <option>Rosas</option>
+        <option>Leblon</option>
+        <option>Laranjeiras</option>
+        <option>Morro da Urca</option>
+        <option>Cervejaria</option>
+        <option>Onze Copos Participações</option>
+      </select>
+      <button id="startCourseBtn">Começar o curso</button>
+    </div>
+  </div>
+</section>
+
+<div id="courseContent" style="display:none;">
+
+<section class="module" id="mod1" data-mod="1">
+  <div class="mod-head"><span class="mod-num">01</span><h2>O atendimento é o nosso produto</h2></div>
+  <p>O cliente pode até esquecer o gosto exato de um prato ou drink — mas ele nunca esquece como foi tratado. Num bar ou restaurante, a experiência que a pessoa vive <b>é</b> o produto, tanto quanto a comida e a bebida.</p>
+  <div class="card">
+    <p>Um bom atendimento influencia diretamente:</p>
+    <ul class="simple">
+      <li><b>Se o cliente volta</b> — e traz gente junto da próxima vez.</li>
+      <li><b>A gorjeta</b> — atendimento bom é a forma mais direta de valorizar seu trabalho.</li>
+      <li><b>A avaliação online</b> (Google, iFood) — que traz ou afasta novos clientes antes mesmo de eles pisarem na loja.</li>
+      <li><b>O clima do time</b> — quando o atendimento vai bem, o salão inteiro trabalha mais leve.</li>
+    </ul>
+    <div class="tip"><span class="eyebrow">Dica do mestre-cervejeiro</span>Ninguém lembra o nome de todas as cervejas que bebeu, mas todo mundo lembra de um lugar onde se sentiu bem tratado — e de um lugar onde se sentiu ignorado.</div>
+  </div>
+  <button class="mark-btn" data-mark="1">Marcar módulo como concluído</button>
+</section>
+
+<section class="module" id="mod2" data-mod="2">
+  <div class="mod-head"><span class="mod-num">02</span><h2>A primeira impressão em segundos</h2></div>
+  <p>O cliente forma uma opinião sobre o atendimento nos primeiros segundos — muito antes de pedir qualquer coisa. Isso vem da postura, não só das palavras.</p>
+  <div class="card">
+    <ul class="simple">
+      <li><b>Perceba a chegada</b> — um aceno, um "já vou te atender", olhar nos olhos. Ninguém gosta de ficar parado sem ser notado.</li>
+      <li><b>Postura aberta</b> — corpo virado pro cliente, sem cruzar os braços, sem parecer apressado ou incomodado.</li>
+      <li><b>Tom de voz</b> importa tanto quanto as palavras — o mesmo "boa noite" pode soar acolhedor ou automático, dependendo de como é dito.</li>
+      <li><b>Agilidade sem pressa aparente</b> — o cliente quer ser atendido rápido, mas não quer sentir que está sendo "despachado".</li>
+    </ul>
+    <div class="tip"><span class="eyebrow">Na prática</span>Se você está ocupado com outra mesa, um simples contato visual e um aceno já avisam ao cliente "eu te vi, já vou te atender" — isso muda completamente a percepção de espera.</div>
+  </div>
+  <button class="mark-btn" data-mark="2">Marcar módulo como concluído</button>
+</section>
+
+<section class="module" id="mod3" data-mod="3">
+  <div class="mod-head"><span class="mod-num">03</span><h2>Escuta ativa e comunicação</h2></div>
+  <p>Boa parte do bom atendimento é simplesmente <b>escutar de verdade</b> o que o cliente está pedindo ou perguntando — sem interromper e sem responder no piloto automático.</p>
+  <div class="card">
+    <ul class="simple">
+      <li>Deixe o cliente terminar de falar antes de responder — mesmo que você já saiba o que ele vai pedir.</li>
+      <li>Confirme o pedido em voz alta ("então vai ser uma X e uma Y, certo?") — evita erro e mostra atenção.</li>
+      <li>Se não souber responder algo (ingrediente, tempo de preparo), não invente — pergunte pra cozinha/bar e volte com a resposta certa.</li>
+      <li>Evite termos técnicos que o cliente pode não entender sem explicar — nem todo mundo sabe o que é "dry hop" ou "IPA", por exemplo.</li>
+    </ul>
+    <div class="tip"><span class="eyebrow">Sinal de alerta</span>Se você perceber que respondeu "sim" ou "com certeza" sem realmente ter entendido o que o cliente pediu, pare e pergunte de novo — corrigir antes é sempre mais rápido que corrigir depois.</div>
+  </div>
+  <button class="mark-btn" data-mark="3">Marcar módulo como concluído</button>
+</section>
+
+<section class="module" id="mod4" data-mod="4">
+  <div class="mod-head"><span class="mod-num">04</span><h2>Lidando com reclamações (a virada de mesa)</h2></div>
+  <p>Toda casa recebe reclamação, cedo ou tarde. O que separa um cliente perdido de um cliente fidelizado não é o problema em si — é <b>como ele foi resolvido</b>.</p>
+  <div class="card">
+    <ul class="simple">
+      <li><b>Escute sem se defender primeiro.</b> Deixe o cliente colocar a reclamação toda pra fora antes de explicar o que aconteceu.</li>
+      <li><b>Reconheça o incômodo</b>, mesmo que o erro não tenha sido seu ("entendo, isso realmente não devia ter acontecido").</li>
+      <li><b>Nunca discuta ou corrija o cliente na frente de outras pessoas</b> — mesmo que ele esteja errado, isso vira constrangimento público.</li>
+      <li><b>Resolva ou chame quem resolve.</b> Trocar o prato, oferecer algo, ou chamar o gerente — o importante é agir, não só se desculpar.</li>
+      <li><b>Combine com o time</b> até onde você pode decidir sozinho e a partir de quando precisa escalar para a liderança.</li>
+    </ul>
+    <div class="tip"><span class="eyebrow">Dica do mestre-cervejeiro</span>Um problema bem resolvido pode deixar o cliente com uma impressão até melhor do que se nada tivesse dado errado — porque ele viu que a casa se importa de verdade.</div>
+  </div>
+  <button class="mark-btn" data-mark="4">Marcar módulo como concluído</button>
+</section>
+
+<section class="module" id="mod5" data-mod="5">
+  <div class="mod-head"><span class="mod-num">05</span><h2>Sugestão de venda sem parecer forçado</h2></div>
+  <p>Sugerir um prato, uma cerveja ou uma sobremesa é parte do trabalho — mas a diferença entre "boa sugestão" e "venda forçada" está em como e quando você faz isso.</p>
+  <div class="card">
+    <ul class="simple">
+      <li><b>Conheça o cardápio de verdade</b> — sabor, ingredientes, harmonizações. Isso permite sugerir algo que realmente combina com o que o cliente já pediu ou comentou.</li>
+      <li><b>Sugira baseado no que a pessoa disse</b> ("já que você gostou de amargor, essa outra também combina") — não empurre sempre o item mais caro.</li>
+      <li><b>Uma sugestão, não insistência.</b> Se o cliente disser "não, obrigado", respeite e siga — insistir vira desconforto.</li>
+      <li><b>Timing importa</b> — sugerir sobremesa no meio do prato principal, por exemplo, é diferente de sugerir no momento certo.</li>
+    </ul>
+    <div class="tip"><span class="eyebrow">Na prática</span>Uma boa sugestão parece um conselho de quem entende do assunto, não uma meta de vendas sendo empurrada pro cliente.</div>
+  </div>
+  <button class="mark-btn" data-mark="5">Marcar módulo como concluído</button>
+</section>
+
+<section class="module" id="mod6" data-mod="6">
+  <div class="mod-head"><span class="mod-num">06</span><h2>Avaliações online: pedir e responder</h2></div>
+  <p>Hoje, boa parte da decisão de vir (ou não vir) à sua loja é tomada antes mesmo do cliente chegar — olhando as notas e comentários no Google e no iFood.</p>
+  <div class="card">
+    <ul class="simple">
+      <li><b>Peça avaliação no momento certo</b> — depois de um elogio espontâneo do cliente, ou ao final de uma experiência visivelmente boa. Nunca insista se o cliente pareceu insatisfeito.</li>
+      <li><b>Seja natural ao pedir</b> — "se puder deixar uma avaliação pra gente, ajuda muito" já é suficiente, sem parecer forçado.</li>
+      <li><b>Nunca discuta com uma avaliação negativa publicamente.</b> Responder de forma defensiva ou grosseira só reforça a má impressão pra quem lê depois.</li>
+      <li><b>Responda com empatia e leve pra resolução fora do público</b> — algo como "sentimos muito pela experiência, gostaríamos de entender melhor o que houve, pode nos chamar no [contato]?".</li>
+    </ul>
+    <div class="tip"><span class="eyebrow">Sinal de alerta</span>Se uma avaliação negativa te deixou irritado e você sentir vontade de "rebater" o cliente, é sinal de parar e chamar a liderança antes de responder — resposta no calor do momento raramente ajuda a marca.</div>
+  </div>
+  <button class="mark-btn" data-mark="6">Marcar módulo como concluído</button>
+</section>
+
+<section class="module" id="quiz">
+  <div class="mod-head"><span class="mod-num">07</span><h2>Avaliação final</h2></div>
+  <p>Responda as perguntas abaixo. Você precisa acertar pelo menos <span id="notaMinimaLabel">9 de 13</span> para liberar o certificado.</p>
+  <div class="card" id="quizCard"></div>
+  <button id="submitQuiz">Enviar respostas</button>
+  <button id="resetQuiz" style="display:none;">Tentar novamente</button>
+  <div id="quizResult"></div>
+</section>
+
+<section class="module" id="certSection">
+  <div class="mod-head"><span class="mod-num">08</span><h2>Seu certificado</h2></div>
+  <p>Parabéns por completar o curso! Confira seus dados e gere o certificado.</p>
+  <div class="cert-form">
+    <input type="text" id="certName" placeholder="Nome completo">
+    <select id="certUnit">
+      <option value="">Selecione sua unidade</option>
+      <option>Gávea</option>
+      <option>Terraço</option>
+      <option>Tijuca</option>
+      <option>Rosas</option>
+      <option>Leblon</option>
+      <option>Laranjeiras</option>
+      <option>Morro da Urca</option>
+      <option>Cervejaria</option>
+      <option>Onze Copos Participações</option>
+    </select>
+    <button id="genCert">Gerar certificado</button>
+  </div>
+
+  <div id="certificate">
+    <div class="cert-eyebrow">Universidade Corporativa Brewteco</div>
+    <div class="cert-title">Certificado de Conclusão</div>
+    <div class="cert-sub">Grupo Onze Copos</div>
+    <div class="cert-name" id="certNameOut">Nome do Colaborador</div>
+    <div class="cert-body">Certificamos que <span id="certNameOut2">o(a) colaborador(a)</span> concluiu com aproveitamento o curso <b>"Atendimento Nota 10: Experiência do Cliente Brewteco"</b>, promovido pela área de Gente, Gestão &amp; Cultura (GGC).</div>
+    <div class="cert-foot">
+      <div>
+        CPF: <span id="certCPFOut">—</span><br>
+        Unidade: <span id="certUnitOut">—</span><br>
+        Emitido em <span id="certDate"></span><br>
+        Nota final: <span id="certScore"></span>
+      </div>
+      <div class="cert-seal">GGC<br>Brewteco</div>
+      <div style="text-align:right;">
+        Fred Moussallem<br>Head de Gente, Gestão &amp; Cultura
+      </div>
+    </div>
+  </div>
+  <button id="downloadBtn" style="display:none;">Baixar certificado (PNG)</button>
+</section>
+
+</div>
+
+</main>
+
+<footer>Brewteco · Grupo Onze Copos — Entregar Experiências com Alma</footer>
+
+<script>
+const modules = [1,2,3,4,5,6];
+const completed = new Set();
+
+const dotsEl = document.getElementById('dots');
+function buildDots(){
+  dotsEl.innerHTML = '';
+  const items = [
+    {id:'mod1', label:'1. Nosso produto'},
+    {id:'mod2', label:'2. Primeira impressão'},
+    {id:'mod3', label:'3. Escuta ativa'},
+    {id:'mod4', label:'4. Reclamações'},
+    {id:'mod5', label:'5. Venda sugestiva'},
+    {id:'mod6', label:'6. Avaliações online'},
+    {id:'quiz', label:'7. Avaliação'},
+    {id:'certSection', label:'8. Certificado'}
+  ];
+  items.forEach(it=>{
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.textContent = it.label;
+    d.onclick = ()=>document.getElementById(it.id).scrollIntoView({behavior:'smooth'});
+    d.dataset.target = it.id;
+    dotsEl.appendChild(d);
+  });
+}
+buildDots();
+
+function updateGlass(){
+  const pct = Math.round((completed.size / modules.length) * 100);
+  document.getElementById('glassPct').textContent = pct + '%';
+  const fill = document.getElementById('glassFill');
+  const foam = document.getElementById('glassFoam');
+  const totalHeight = 128;
+  const h = (pct/100) * totalHeight;
+  fill.setAttribute('y', 150 - h);
+  fill.setAttribute('height', h);
+  foam.setAttribute('y', 150 - h - 4);
+}
+
+document.querySelectorAll('.mark-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const n = btn.dataset.mark;
+    completed.add(n);
+    btn.textContent = 'Módulo concluído ✓';
+    btn.classList.add('done');
+    updateGlass();
+  });
+});
+
+// ---------------- QUIZ ----------------
+const questions = [
+  {
+    q:"No atendimento de bar/restaurante, o que costuma ficar mais marcado na lembrança do cliente?",
+    opts:["O preço exato de cada item do cardápio","Como ele foi tratado durante a experiência","O nome de todos os funcionários que o atenderam","O horário exato em que chegou"],
+    correct:1
+  },
+  {
+    q:"Um bom atendimento influencia diretamente em:",
+    opts:["Apenas no valor da conta final","Se o cliente volta, na gorjeta e nas avaliações online","Somente na velocidade da cozinha","Nada além da satisfação momentânea"],
+    correct:1
+  },
+  {
+    q:"O cliente acabou de chegar e você está ocupado em outra mesa. O que fazer?",
+    opts:["Ignorar até terminar o que está fazendo","Dar um aceno ou um 'já vou te atender' rapidamente","Pedir pra ele esperar sem dizer nada","Chamar outro colega gritando de longe"],
+    correct:1
+  },
+  {
+    q:"Qual atitude ajuda a transmitir boa primeira impressão?",
+    opts:["Postura fechada, de braços cruzados","Contato visual, postura aberta e tom de voz acolhedor","Falar o mais rápido possível, sem pausas","Evitar olhar diretamente para o cliente"],
+    correct:1
+  },
+  {
+    q:"Por que é importante confirmar o pedido em voz alta com o cliente?",
+    opts:["Para parecer mais formal","Para evitar erros e mostrar atenção","Não é necessário, atrasa o atendimento","Só é preciso em pedidos muito grandes"],
+    correct:1
+  },
+  {
+    q:"Se você não sabe responder uma pergunta do cliente sobre um prato, o que fazer?",
+    opts:["Inventar uma resposta rápida para não parecer perdido","Dizer que não sabe e ignorar a pergunta","Perguntar para a cozinha/bar e voltar com a resposta certa","Mudar de assunto"],
+    correct:2
+  },
+  {
+    q:"Diante de uma reclamação, qual é a primeira atitude recomendada?",
+    opts:["Se defender e explicar por que não foi culpa sua","Escutar o cliente sem interromper antes de responder","Ignorar até o cliente se acalmar sozinho","Chamar outro cliente para não dar atenção à reclamação"],
+    correct:1
+  },
+  {
+    q:"Qual atitude NUNCA deve ser feita diante de uma reclamação?",
+    opts:["Reconhecer o incômodo do cliente","Resolver ou chamar quem pode resolver","Discutir ou corrigir o cliente na frente de outras pessoas","Agir rapidamente para solucionar"],
+    correct:2
+  },
+  {
+    q:"O que caracteriza uma boa sugestão de venda (em vez de uma venda forçada)?",
+    opts:["Insistir até o cliente aceitar","Sugerir sempre o item mais caro do cardápio","Sugerir com base no que o cliente já disse gostar, sem insistir se ele recusar","Empurrar a sugestão em qualquer momento da refeição"],
+    correct:2
+  },
+  {
+    q:"Qual é o momento mais adequado para pedir uma avaliação online ao cliente?",
+    opts:["Assim que ele reclamou de algo","Depois de um elogio espontâneo ou de uma experiência visivelmente boa","No meio de uma reclamação, para tentar reverter a nota","Não existe um momento melhor, pode ser sempre"],
+    correct:1
+  },
+  {
+    q:"Como responder a uma avaliação negativa publicada online?",
+    opts:["Discutir publicamente para provar que o cliente está errado","Ignorar e não responder nunca","Com empatia, reconhecendo o problema e levando a resolução para um contato direto","Responder de forma seca, só para constar"],
+    correct:2
+  },
+  {
+    q:"Você ficou irritado com uma avaliação negativa e quer responder na hora. O que é mais recomendado?",
+    opts:["Responder imediatamente para não perder o embalo","Parar, respirar e, se possível, chamar a liderança antes de responder","Responder com o mesmo tom da reclamação","Deletar a avaliação, se for possível"],
+    correct:1
+  },
+  {
+    q:"Um problema foi bem resolvido para o cliente durante a experiência. O que isso pode gerar?",
+    opts:["Nada muda, o cliente sempre sai insatisfeito quando há erro","O cliente pode sair com uma impressão até melhor do que se nada tivesse acontecido","O cliente nunca mais volta, independente da solução","A avaliação online será sempre negativa"],
+    correct:1
+  }
+];
+
+const quizCard = document.getElementById('quizCard');
+questions.forEach((item, i)=>{
+  const block = document.createElement('div');
+  block.className='q-block';
+  block.dataset.index=i;
+  block.innerHTML = `<div class="q-title">${i+1}. ${item.q}</div>` +
+    item.opts.map((opt,j)=>`
+      <label class="opt" data-q="${i}" data-opt="${j}">
+        <input type="radio" name="q${i}" value="${j}"> <span>${opt}</span>
+      </label>`).join('');
+  quizCard.appendChild(block);
+});
+
+quizCard.addEventListener('click', (e)=>{
+  const label = e.target.closest('.opt');
+  if(!label) return;
+  const q = label.dataset.q;
+  document.querySelectorAll(`.opt[data-q="${q}"]`).forEach(o=>o.classList.remove('selected'));
+  label.classList.add('selected');
+  label.querySelector('input').checked = true;
+});
+
+let finalScore = 0;
+document.getElementById('submitQuiz').addEventListener('click', ()=>{
+  let correctCount = 0;
+  let unanswered = 0;
+  questions.forEach((item,i)=>{
+    const selected = document.querySelector(`input[name="q${i}"]:checked`);
+    const opts = document.querySelectorAll(`.opt[data-q="${i}"]`);
+    if(!selected){ unanswered++; }
+    opts.forEach(o=>{
+      const optIndex = parseInt(o.dataset.opt);
+      if(optIndex === item.correct) o.classList.add('correct');
+      else if(selected && parseInt(selected.value) === optIndex) o.classList.add('incorrect');
+    });
+    if(selected && parseInt(selected.value) === item.correct) correctCount++;
+  });
+
+  if(unanswered > 0){
+    alert('Responda todas as perguntas antes de enviar. Faltam ' + unanswered + '.');
+    document.querySelectorAll('.opt.correct, .opt.incorrect').forEach(o=>o.classList.remove('correct','incorrect'));
+    return;
+  }
+
+  finalScore = correctCount;
+  const resultEl = document.getElementById('quizResult');
+  resultEl.style.display = 'block';
+  const passed = correctCount >= 9;
+  resultEl.className = passed ? 'pass' : 'fail';
+  resultEl.textContent = passed
+    ? `Você acertou ${correctCount}/${questions.length}. Aprovado! Role para baixo para gerar seu certificado.`
+    : `Você acertou ${correctCount}/${questions.length}. É preciso acertar pelo menos 9 para aprovação. Revise os módulos e tente novamente.`;
+
+  document.getElementById('submitQuiz').style.display='none';
+  document.getElementById('resetQuiz').style.display='inline-block';
+
+  if(passed){
+    document.getElementById('certSection').style.display='block';
+    registrarEvento('Conclusão', {nota: correctCount + "/" + questions.length});
+  }
+});
+
+document.getElementById('resetQuiz').addEventListener('click', ()=>{
+  document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected','correct','incorrect'));
+  document.getElementById('quizResult').style.display='none';
+  document.getElementById('submitQuiz').style.display='inline-block';
+  document.getElementById('resetQuiz').style.display='none';
+  document.getElementById('certSection').style.display='none';
+});
+
+// ---------------- CONFIG DE REGISTRO (opcional) ----------------
+// Cole aqui a URL do webhook (Make.com) que recebe os dados e grava numa planilha.
+// Pode reutilizar o MESMO webhook do curso de educação financeira, desde que a
+// planilha tenha uma coluna "Curso" mapeada para o campo `curso` — assim dá pra
+// filtrar os registros de cada curso na mesma aba.
+const REGISTRO_WEBHOOK_URL = "";
+
+let userName = "";
+let userUnit = "";
+let userCPF = "";
+
+function cpfValido(cpf){
+  cpf = cpf.replace(/\D/g, '');
+  if(cpf.length !== 11) return false;
+  if(/^(\d)\1{10}$/.test(cpf)) return false;
+  let soma = 0;
+  for(let i = 0; i < 9; i++) soma += parseInt(cpf[i]) * (10 - i);
+  let resto = (soma * 10) % 11;
+  if(resto === 10 || resto === 11) resto = 0;
+  if(resto !== parseInt(cpf[9])) return false;
+  soma = 0;
+  for(let i = 0; i < 10; i++) soma += parseInt(cpf[i]) * (11 - i);
+  resto = (soma * 10) % 11;
+  if(resto === 10 || resto === 11) resto = 0;
+  if(resto !== parseInt(cpf[10])) return false;
+  return true;
+}
+function formatarCPF(cpf){
+  cpf = cpf.replace(/\D/g, '');
+  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+}
+
+function registrarEvento(evento, extra){
+  extra = extra || {};
+  if(!REGISTRO_WEBHOOK_URL) return;
+  const payload = Object.assign({
+    curso: "Atendimento Nota 10 - Experiência do Cliente Brewteco",
+    evento: evento,
+    nome: userName,
+    cpf: userCPF,
+    unidade: userUnit,
+    data: new Date().toLocaleDateString('pt-BR'),
+    hora: new Date().toLocaleTimeString('pt-BR'),
+    timestamp_iso: new Date().toISOString()
+  }, extra);
+  fetch(REGISTRO_WEBHOOK_URL, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  }).catch(()=>{ /* silencioso: não bloqueia o uso do curso */ });
+}
+
+document.getElementById('startCourseBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('gateName').value.trim();
+  const cpfRaw = document.getElementById('gateCPF').value;
+  const unit = document.getElementById('gateUnit').value;
+  if(!name){ alert('Digite seu nome completo.'); return; }
+  if(!cpfValido(cpfRaw)){ alert('Digite um CPF válido.'); return; }
+  if(!unit){ alert('Selecione sua unidade.'); return; }
+  userName = name;
+  userCPF = formatarCPF(cpfRaw);
+  userUnit = unit;
+  document.getElementById('idGate').style.display = 'none';
+  document.getElementById('courseContent').style.display = 'block';
+  document.getElementById('certName').value = userName;
+  document.getElementById('certUnit').value = userUnit;
+  registrarEvento('Acesso');
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+document.getElementById('genCert').addEventListener('click', ()=>{
+  const name = document.getElementById('certName').value.trim();
+  const unit = document.getElementById('certUnit').value;
+  if(!name){ alert('Digite seu nome completo.'); return; }
+  if(!unit){ alert('Selecione sua unidade.'); return; }
+  document.getElementById('certNameOut').textContent = name;
+  document.getElementById('certNameOut2').textContent = name;
+  document.getElementById('certUnitOut').textContent = unit;
+  document.getElementById('certCPFOut').textContent = userCPF || '—';
+  document.getElementById('certScore').textContent = finalScore + '/' + questions.length;
+  const today = new Date();
+  const dataFormatada = today.toLocaleDateString('pt-BR');
+  document.getElementById('certDate').textContent = dataFormatada;
+  document.getElementById('certificate').style.display='block';
+  document.getElementById('downloadBtn').style.display='inline-block';
+  document.getElementById('certificate').scrollIntoView({behavior:'smooth'});
+
+  registrarEvento('Certificado Emitido', {
+    nome: name,
+    unidade: unit,
+    nota: finalScore + "/" + questions.length,
+    data_conclusao: dataFormatada
+  });
+});
+
+document.getElementById('downloadBtn').addEventListener('click', ()=>{
+  const cert = document.getElementById('certificate');
+  html2canvas(cert, {backgroundColor:'#FBF3E7', scale:2}).then(canvas=>{
+    const link = document.createElement('a');
+    const name = document.getElementById('certName').value.trim().replace(/\s+/g,'_') || 'colaborador';
+    link.download = `certificado_atendimento_${name}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+});
+
+updateGlass();
+</script>
+</body>
+</html>
